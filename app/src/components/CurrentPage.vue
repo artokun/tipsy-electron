@@ -19,6 +19,8 @@
       handleFile () {
         sh.exec('screencapture -scx', (code, stdout, stderr) => {
           this.image = this.$electron.clipboard.readImage().toDataURL()
+          // handle QuaggaJS for barcode decode
+          // https://serratus.github.io/quaggaJS/
         })
       }
     }
