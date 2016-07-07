@@ -12,18 +12,13 @@
     name: 'landing-page',
     data () {
       return {
-        image:''
+        image: ''
       }
     },
     methods: {
       handleFile () {
         sh.exec('screencapture -scx', (code, stdout, stderr) => {
-          stdout.onload = () => {
-            let reader = new FileReader()
-            reader.onloadend = () {
-              this.image = reader.result
-            }
-          }
+          this.image = this.$electron.clipboard.readImage().toDataURL()
         })
       }
     }
