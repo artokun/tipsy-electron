@@ -1,10 +1,7 @@
 <template>
   <div>
     <button type="file" name="name" @click="handleFile()">Do the thing</button>
-    <pre>
-      {{ name }}
-      {{ exec }}
-    </pre>
+    <img v-show="image" :src="image" alt="" />
   </div>
 </template>
 
@@ -15,16 +12,18 @@
     name: 'landing-page',
     data () {
       return {
-        exec: ''
+        image:''
       }
     },
     methods: {
       handleFile () {
-        // this.exec = exec('screencapture -scx')
         sh.exec('screencapture -scx', (code, stdout, stderr) => {
-          console.log('Exit code:', code)
-          console.log('Program output:', stdout)
-          console.log('Program stderr:', stderr)
+          stdout.onload = () => {
+            let reader = new FileReader()
+            reader.onloadend = () {
+              this.image = reader.result
+            }
+          }
         })
       }
     }
