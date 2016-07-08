@@ -15,6 +15,9 @@ router.map(routes)
 router.beforeEach(() => {
   window.scrollTo(0, 0)
 })
+router.afterEach(({to}) => {
+  console.debug('transitioning to', to.path)
+})
 router.redirect({
   '*': '/'
 })
