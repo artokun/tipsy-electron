@@ -6,6 +6,7 @@
 </template>
 
 <script>
+/* globals Quagga */
 import sh from 'shelljs'
 
 export default {
@@ -18,9 +19,21 @@ export default {
   methods: {
     handleFile () {
       sh.exec('screencapture -scx', (code, stdout, stderr) => {
-        this.image = this.$electron.clipboard.readImage().toDataURL()
-        // handle QuaggaJS for barcode decode
-        // https://serratus.github.io/quaggaJS/
+        let capturedImage = this.$electron.clipboard.readImage().toDataURL()
+
+        Quagga.decodeSingle({
+          decoder: {
+            readers: ['code_39_reader'] // List of active readers
+          },
+          locate: true, // try to locate the barcode in the image
+          src: capturedImage // or 'data:image/jpg;base64,' + data
+        }, function (result) {
+          if (result.codeResult) {
+            console.log('result', result.codeResult.code)
+          } else {
+            console.log('not detected')
+          }
+        })
       })
     }
   }
