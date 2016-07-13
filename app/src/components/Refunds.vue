@@ -64,4 +64,7 @@
       transition: padding .5s ease-in-out, background-color .3s ease-in-out;
     }
   }
+  .pane {
+    display: block;
+  }
 </style>

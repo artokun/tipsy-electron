@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="container">
     <p>
       Click on one of the steps on the left to begin the refund flow.
     </p>
@@ -15,5 +15,10 @@
 </script>
 
 <style scoped>
-
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
 </style>
