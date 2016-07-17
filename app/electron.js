@@ -4,6 +4,7 @@ const electron = require('electron')
 const path = require('path')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
+const globalShortcut = electron.globalShortcut
 
 let mainWindow
 let config = {}
@@ -50,6 +51,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('will-quit', function () {
+  globalShortcut.unregisterAll()
 })
 
 app.on('activate', () => {
