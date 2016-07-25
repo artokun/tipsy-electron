@@ -3,15 +3,15 @@
     <table class="table-striped">
       <thead>
         <tr>
-          <th>Exchange Order#</th>
-          <th>Note</th>
+          <th>Exchange Order# (Double Click to Copy)</th>
+          <th>Note (Double Click to Copy)</th>
           <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="item in barcodes" class="{{item.isFound ? 'duplicate' : 'exchange'}}">
-          <td>{{item.code}}</td>
-          <td>{{item.note}}</td>
+          <td v-on:dblclick="copyTarget" style="cursor: pointer">{{item.code}}</td>
+          <td v-on:dblclick="copyTarget" style="cursor: pointer">{{item.note}}</td>
           <td>Pending</td>
         </tr>
       </tbody>
@@ -44,9 +44,13 @@
           if (this.webviewLoaded) { return }
           webview.loadURL('http://tipsyelves.com/admin')
           this.webviewLoaded = true
-          webview.openDevTools()
+          // webview.openDevTools()
           webview.executeJavaScript(this.injectJquery(), null, this.login(webview))
         })
+      },
+      copyTarget (event) {
+        this.$electron.clipboard.writeText(event.target.textContent)
+        console.debug('copied to clipboard: ', event.target.textContent)
       },
       login (webview) {
         /*eslint-disable quotes*/
