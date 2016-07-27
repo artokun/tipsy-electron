@@ -7,10 +7,16 @@
           <div class="image-container">
             <img :src="image" alt="Barcode Capture"/>
           </div>
-          <input type="text" class="capture-status" v-model="status.message">
+          <input type="text" style="width: 300px" class="form-control capture-status" v-model="status.message">
         </div>
       </div>
-      <button class="btn btn-large btn-primary" @click="onCaptureBarcode">Start Capture | &#8984;⌥ + B</button>
+      <div class="form-group">
+        <button class="btn btn-large btn-primary" @click="onCaptureBarcode">Start Capture | &#8984;⌥ + B</button>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-large btn-default" :disabled="!customKey" @click="onCaptureBarcode(false)">Add Custom Order#</button>
+        <input type="number" style="width: 200px" class="form-control" name="custom" v-model="customKey">
+      </div>
     </div>
     <div class="capture__table">
       <table class="table-striped">
@@ -64,14 +70,16 @@ export default {
   data () {
     return {
       image: '',
-      status: '',
+      status: { message: '', status: '' },
       noteIndex: null,
-      noteMessage: ''
+      noteMessage: '',
+      customKey: null
     }
   },
   vuex: {
     getters: {
-      barcodes: ({ barcode }) => barcode.list
+      barcodes: ({ barcode }) => barcode.list,
+      exchangeList: ({ barcode }) => barcode.exchangeList
     },
     actions: {
       addBarcode: ({ dispatch }, payload) => dispatch('ADD_BARCODE', payload),
@@ -86,8 +94,20 @@ export default {
     }
   },
   methods: {
-    onCaptureBarcode () {
+    onCaptureBarcode (isCustom) {
       this.status = { message: '', status: '' }
+      if (!isCustom) {
+        if (this.customKey.length === 13 || this.customKey.length === 9) {
+          this.addBarcode({ code: this.customKey, notes: '' })
+        } else {
+          this.status = { message: 'Invalid Code: Must be either 9 or 13 digits long', status: 'danger' }
+          return
+        }
+        this.onOpenNote(this.barcodes.length - 1)
+        this.status = { message: 'Custom Key Added', status: 'success' }
+        this.customKey = null
+        return
+      }
       sh.exec('screencapture -scx', (code, stdout, stderr) => {
         let capturedImage = this.$electron.clipboard.readImage().toDataURL()
         this.image = capturedImage
@@ -108,7 +128,14 @@ export default {
               this.status = { message: 'Already Scanned', status: 'alert' }
               return
             }
-
+            if (this.adjustCode(result.codeResult.code).substring(0, 1) === '9') {
+              this.$electron.remote.dialog.showMessageBox({
+                type: 'warning',
+                buttons: ['OK'],
+                defaultId: 0,
+                message: `This return/exchange needs further research.\nCODE: ${this.adjustCode(result.codeResult.code)}`
+              })
+            }
             result.codeResult = Object.assign(result.codeResult, { notes: '' })
 
             this.addBarcode(result.codeResult)
@@ -121,6 +148,7 @@ export default {
       })
     },
     adjustCode (code) {
+      if (code.length === 9) { return code }
       return code.substring(6).replace(/1/, '100')
     },
     onOpenNote (index) {
@@ -164,5 +192,8 @@ export default {
   }
   .icon-cancel {
     font-size: 20px;
+  }
+  textarea {
+    width: 100%;
   }
 </style>

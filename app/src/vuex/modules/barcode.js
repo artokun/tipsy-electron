@@ -3,7 +3,8 @@ import {} from '../mutation-types'
 const state = {
   list: [],
   exchangeList: [],
-  returnsList: []
+  returnsList: [],
+  rawReturns: []
 }
 
 const mutations = {
@@ -16,8 +17,14 @@ const mutations = {
   UPDATE_NOTE (state, payload) {
     state.list[payload.index].notes = payload.note
   },
+  UPDATE_COMMENT (state, payload) {
+    state.rawReturns[payload.index].COMMENTS = payload.note
+  },
   SET_EXCHANGES_LIST (state, payload) {
     state.exchangeList = payload
+  },
+  SET_RAW_RETURNS_LIST (state, payload) {
+    state.rawReturns = payload
   },
   SET_RETURNS_LIST (state, payload) {
     state.returnsList = payload
